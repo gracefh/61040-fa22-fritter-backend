@@ -5,7 +5,7 @@ import GroupCollection from '../group/collection';
 /**
  * Checks if a group with groupId in req.params exists
  */
-const doesGroupExist = async (req: Request, res: Response, next: NextFunction) => {
+const doesGroupParamExist = async (req: Request, res: Response, next: NextFunction) => {
   const validFormat = Types.ObjectId.isValid(req.params.groupId);
   const group = validFormat ? await GroupCollection.findOneByGroupId(req.params.groupId) : '';
   if (!group) {
@@ -19,6 +19,32 @@ const doesGroupExist = async (req: Request, res: Response, next: NextFunction) =
 
   next();
 };
+
+/**
+ * Checks if a group with groupId in req.query exists
+ */
+ const doesGroupQueryExist = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.query.groupId) {
+        res.status(400).json({
+            error: 'Provided group Id must be nonempty.'
+          });
+          return;
+    }
+    const groupId = req.query.groupId as string
+    const validFormat = Types.ObjectId.isValid(groupId);
+    const group = validFormat ? await GroupCollection.findOneByGroupId(groupId) : '';
+    if (!group) {
+      res.status(404).json({
+        error: {
+          groupNotFound: `Group with group ID ${groupId} does not exist.`
+        }
+      });
+      return;
+    }
+  
+    next();
+  };
+  
 
 /**
  * Checks if a group name in req.body is already in use
@@ -55,5 +81,5 @@ const doesGroupExist = async (req: Request, res: Response, next: NextFunction) =
   };
 
 export {
-    doesGroupExist, isGroupNameNotAlreadyInUse, isGroupOwner
+    doesGroupParamExist, doesGroupQueryExist, isGroupNameNotAlreadyInUse, isGroupOwner
   };

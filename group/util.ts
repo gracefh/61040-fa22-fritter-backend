@@ -65,7 +65,9 @@ export const constructGroupResponse = (
     ...groupCopy,
     _id: groupCopy._id.toString(),
     members: Array.from(groupCopy.members.values()).map((id) => id.toString()),
-    moderators: Array.from(groupCopy.moderators.values()).map((id) => id.toString()),
+    moderators: Array.from(groupCopy.moderators.values()).map((id) =>
+      id.toString()
+    ),
     owner: groupCopy.owner.toString(),
     freets: Array.from(groupCopy.freets.values()).map((id) => id.toString()),
   };

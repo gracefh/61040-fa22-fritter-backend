@@ -58,7 +58,7 @@ router.put(
   [
     userValidator.isUserLoggedIn,
     groupValidator.isGroupOwner,
-    groupValidator.doesGroupExist,
+    groupValidator.doesGroupParamExist,
     groupValidator.isGroupNameNotAlreadyInUse,
   ],
   async (req: Request, res: Response) => {
@@ -89,7 +89,7 @@ router.delete(
   [
     userValidator.isUserLoggedIn,
     groupValidator.isGroupOwner,
-    groupValidator.doesGroupExist,
+    groupValidator.doesGroupParamExist,
   ],
   async (req: Request, res: Response) => {
     const group = await GroupCollection.deleteOne(req.params.groupId);
@@ -129,7 +129,7 @@ router.get(
 
     res.status(200).json(response);
   },
-  [groupValidator.doesGroupExist],
+  [groupValidator.doesGroupQueryExist],
   async (req: Request, res: Response) => {
     const group = await GroupCollection.findOneByGroupId(
       req.query.groupId as string
