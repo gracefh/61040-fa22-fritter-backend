@@ -79,21 +79,24 @@ class GroupCollection {
     return GroupModel.find({}).sort({ name: 1 });
   }
 
-
   /**
    * Get all the groups in the database that a specified user is a member of
-   * 
+   *
    * @param {string} userId - The id of the user to query
-   * 
+   *
    * @return {Promise<HydratedDocument<Group>[]>} - An array of all of the groups that the user is in, sorted alphabetically
    */
-   static async findAllWithUser(userId: string): Promise<Array<HydratedDocument<Group>>> {
+  static async findAllWithUser(
+    userId: string
+  ): Promise<Array<HydratedDocument<Group>>> {
     // Retrieves groups and sorts them in alphabetical order
-    const user  = await UserCollection.findOneByUserId(userId);
+    const user = await UserCollection.findOneByUserId(userId);
     const allGroups = await GroupCollection.findAll();
-    return allGroups.filter((group) => group.members.has(user));
+    return allGroups.filter(
+      (group) => group.members.size > 0 && group.members.has(user._id)
+    );
   }
-  
+
   /**
    * Update group's information
    *
@@ -124,17 +127,17 @@ class GroupCollection {
    *
    * @param {string} groupId - group Id to find freets from
    *
-   * @return {Promise<Array<Freet>>} - An array of all of the freets
+   * @return {Promise<Array<Types.ObjectId>>} - An array of all of the freet Id's
    */
-  static async findAllFreets(groupId: string): Promise<Array<Freet>> {
+  static async findAllFreets(groupId: string): Promise<Array<Types.ObjectId>> {
     // Retrieves freets and sorts them in backwards time order
     const group = await GroupCollection.findOneByGroupId(groupId);
     if (group === null) {
       return [];
     }
-    return Array.from(group.freets.values()).sort(
-      (a, b) => b.dateCreated.getTime() - a.dateCreated.getTime()
-    );
+
+    // const freets = await Promise.all(Array.from(group.freets.values()).map(async (freetId) => await FreetCollection.findOne(freetId)));
+    return Array.from(group.freets.values());
   }
 
   /**
@@ -154,7 +157,7 @@ class GroupCollection {
     if (group === null || freet === null)
       // group or freet doesn't exist
       return null;
-    group.freets.add(freet);
+    group.freets.add(freet._id);
 
     await group.save();
     return group;
@@ -177,9 +180,9 @@ class GroupCollection {
       return false;
 
     const freets = group.freets;
-    if (!freets.has(freet)) return false;
+    if (!freets.has(freet._id)) return false;
 
-    freets.delete(freet);
+    freets.delete(freet._id);
 
     await group.save();
     return true;
@@ -207,10 +210,10 @@ class GroupCollection {
       return null;
     if (userType == "member") {
       const members = group.members;
-      members.add(user);
+      members.add(user._id);
     } else if (userType == "moderator") {
       const moderators = group.moderators;
-      moderators.add(user);
+      moderators.add(user._id);
     } else {
       return null; // return null without doing anything if unexpected input
     }
@@ -240,13 +243,13 @@ class GroupCollection {
       return false;
     const members = group.members;
     const moderators = group.moderators;
-    if (!members.has(user) || group.owner === user)
+    if (!members.has(user._id) || group.owner === user._id)
       // group doesn't have user or user is group owner
       return false;
 
-    members.delete(user);
-    if (moderators.has(user)) {
-      moderators.delete(user); // also remove from moderator position
+    members.delete(user._id);
+    if (moderators.has(user._id)) {
+      moderators.delete(user._id); // also remove from moderator position
     }
 
     await group.save();
@@ -274,11 +277,11 @@ class GroupCollection {
       return false;
 
     const moderators = group.moderators;
-    if (!moderators.has(user) || group.owner === user)
+    if (!moderators.has(user._id) || group.owner === user._id)
       // user is not moderator or user is group owner
       return false;
 
-    moderators.delete(user);
+    moderators.delete(user._id);
 
     await group.save();
     return true;
@@ -302,12 +305,12 @@ class GroupCollection {
     if (group === null || user === null) {
       return false;
     }
-    group.owner = user;
-    if (!group.members.has(user)) {
-      group.members.add(user);
+    group.owner = user._id;
+    if (!group.members.has(user._id)) {
+      group.members.add(user._id);
     }
-    if (!group.moderators.has(user)) {
-      group.moderators.add(user);
+    if (!group.moderators.has(user._id)) {
+      group.moderators.add(user._id);
     }
 
     await group.save();

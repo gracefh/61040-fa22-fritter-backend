@@ -13,10 +13,10 @@ export type Group = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   name: string;
   description: string;
-  owner: User;
-  moderators: Set<User>;
-  members: Set<User>;
-  freets: Set<Freet>;
+  owner: Types.ObjectId;
+  moderators: Set<Types.ObjectId>;
+  members: Set<Types.ObjectId>;
+  freets: Set<Types.ObjectId>;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table

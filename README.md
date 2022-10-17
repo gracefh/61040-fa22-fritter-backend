@@ -374,3 +374,40 @@ This renders the `index.html` file that will be used to interact with the backen
 **Throws**
 - `400` if groupId is not given
 - `404` if the group Id does not exist
+
+#### `GET /api/moderator?groupId=ID` - Get moderators for group Id
+
+**Returns**
+- The group moderators for group Id
+
+**Throws**
+- `400` if the group Id is not given
+- `404` if the group Id does not exist
+
+#### `DELETE /api/moderator/post/:groupId` - Delete post in group
+
+#### `DELETE /api/moderator/post/:groupId` - Delete post in group
+
+#### `PUT /api/moderator/member/:groupId` - Add user to group
+
+#### `DELETE /api/moderator/member/:groupId` - Delete member from group
+
+#### `DELETE /api/owner/group/:groupId` - Delete group
+
+#### `DELETE /api/moderator/:groupId` - Remove user from moderator position in group
+
+#### `PUT /api/owner/moderator/:groupId` - Put user in moderator position in group
+
+#### `GET /api/activity/` - Get User's activity for today
+
+#### `GET /api/time-limit/` - Get User's time limit information
+
+#### `PUT /api/time-limit/` - Update User's time limit information
+
+#### `GET /api/notifs/` - Get User's notifications
+
+#### `PUT /api/notifs/` - Add notification to User's notifications
+
+#### `PUT /api/notifs/enable`  - Enable User's notifications for event
+
+#### `PUT /api/notifs/disable`  - Disable User's notifications for event
