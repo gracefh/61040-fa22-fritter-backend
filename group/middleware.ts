@@ -38,6 +38,22 @@ const doesGroupExist = async (req: Request, res: Response, next: NextFunction) =
     });
   };
 
+/**
+ * Checks if the current user is the owner of group whose groupId is in req.params
+ */
+ const isGroupOwner = async (req: Request, res: Response, next: NextFunction) => {
+    const group = await GroupCollection.findOneByGroupId(req.params.groupId);
+    const userId = group.owner._id;
+    if (req.session.userId !== userId.toString()) {
+      res.status(403).json({
+        error: 'Cannot modify a group you don\'t own.'
+      });
+      return;
+    }
+  
+    next();
+  };
+
 export {
-    doesGroupExist, isGroupNameNotAlreadyInUse
+    doesGroupExist, isGroupNameNotAlreadyInUse, isGroupOwner
   };

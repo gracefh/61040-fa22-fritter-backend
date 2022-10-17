@@ -313,3 +313,64 @@ This renders the `index.html` file that will be used to interact with the backen
 **Throws**
 
 - `403` if the user is not logged in
+
+#### `POST /api/groups` -- create a new group
+
+**Body**
+- `name` _{string}_ - The group's name
+- `description` _{string}_ - The group's description
+
+**Returns**
+- A success message
+- An object with the created group's details
+
+**Throws**
+
+- `409` if username is already in use
+
+#### `PUT /api/groups/:groupId` - Update an existing group's information
+
+**Body** _(no need to add fields that are not being changed)_
+- `name` _{string}_ - The group's name
+- `description` _{string}_ - The group's description
+
+**Returns**
+- A success message
+- An object with the update group details
+
+**Throws**
+- `403` if the user is not logged in
+- `403` if the user is not the group creator
+- `409` if the name is already in use
+
+#### `DELETE /api/groups/:groupId?` - Delete an existing group
+
+**Returns**
+- A success message
+
+**Throws**
+- `403` if the user is not logged in
+- `403` if the user is not the group creator
+- `404` if the groupId is invalid
+
+#### `GET /api/groups` - Get all groups
+
+**Returns**
+- An array of group details
+
+#### `GET /api/groups/membership` - Get all groups the user is a member of
+
+**Returns**
+- An array of group details, with one entry for every group the user is in
+
+**Throws**
+- `403` if the user is not logged in
+
+#### `GET /api/groups?groupId=ID` - Get group with group id
+
+**Returns**
+- The group details of the group with Id ID
+
+**Throws**
+- `400` if groupId is not given
+- `404` if the group Id does not exist

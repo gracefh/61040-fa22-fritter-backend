@@ -20,7 +20,7 @@ type GroupResponse = {
  * @param {HydratedDocument<Group>} group - A group object
  * @returns {GroupResponse} - The group object
  */
-const constructGroupResponse = (
+export const constructGroupResponse = (
   group: HydratedDocument<Group>
 ): GroupResponse => {
   const groupCopy: Group = {

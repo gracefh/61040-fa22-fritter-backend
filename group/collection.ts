@@ -81,6 +81,46 @@ class GroupCollection {
     return GroupModel.find({}).sort({ name: 1 });
   }
 
+
+  /**
+   * Get all the groups in the database that a specified user is a member of
+   * 
+   * @param {string} userId - The id of the user to query
+   * 
+   * @return {Promise<HydratedDocument<Group>[]>} - An array of all of the groups that the user is in, sorted alphabetically
+   */
+   static async findAllWithUser(userId: string): Promise<Array<HydratedDocument<Group>>> {
+    // Retrieves groups and sorts them in alphabetical order
+    const user  = await UserCollection.findOneByUserId(userId);
+    const allGroups = await GroupCollection.findAll();
+    return allGroups.filter((group) => group.members.has(user));
+  }
+  
+  /**
+   * Update group's information
+   *
+   * @param {string} groupId - The userId of the user to update
+   * @param {Object} groupDetails - An object with the group's updated info (name/description)
+   * @return {Promise<HydratedDocument<Group>>} - The updated Group
+   */
+  static async updateOne(
+    groupId: Types.ObjectId | string,
+    groupDetails: any
+  ): Promise<HydratedDocument<Group>> {
+    const group = await GroupCollection.findOneByGroupId(groupId);
+    if (groupDetails.name) {
+      group.name = groupDetails.name as string;
+    }
+
+    if (groupDetails.description) {
+      group.description = groupDetails.description as string;
+    }
+
+    await group.save();
+
+    return group;
+  }
+
   /**
    * Get all the freets in a group
    *
@@ -121,6 +161,7 @@ class GroupCollection {
     await group.save();
     return group;
   }
+
   /**
    * Delete freet with given freet id from group with given group id. If freet doesn't exist, is not in the group,
    * or the group doesn't exist, return false. If the freet was successfully deleted, return true
@@ -130,10 +171,7 @@ class GroupCollection {
    *
    * @return {boolean} - as described above
    */
-   static async deleteFreet(
-    freetId: string,
-    groupId: string
-  ): Promise<boolean> {
+  static async deleteFreet(freetId: string, groupId: string): Promise<boolean> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const freet = await FreetCollection.findOne(freetId);
     if (group === null || freet === null)
@@ -141,11 +179,10 @@ class GroupCollection {
       return false;
 
     const freets = group.freets;
-    if (!freets.has(freet))
-      return false;
+    if (!freets.has(freet)) return false;
 
     freets.delete(freet);
-    
+
     await group.save();
     return true;
   }
