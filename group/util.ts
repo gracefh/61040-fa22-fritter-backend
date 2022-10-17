@@ -1,7 +1,7 @@
 import type { HydratedDocument } from "mongoose";
 import type { Group } from "./model";
-import { UserResponse } from "user/util";
-import { formatDate, FreetResponse } from "freet/util";
+import { UserResponse } from "../user/util";
+import { formatDate, FreetResponse } from "../freet/util";
 
 type GroupResponse = {
   _id: string;
@@ -29,21 +29,21 @@ export const constructGroupResponse = (
     }),
   };
 
-  const members = Array.from(groupCopy.members.values()).map((user) => {
+  const members = groupCopy.members.size > 0 ? Array.from(groupCopy.members.values()).map((user) => {
     return {
       _id: user._id.toString(),
       username: user.username,
       dateJoined: formatDate(user.dateJoined),
     };
-  }); // remove password
+  }) : null; // remove password
 
-  const moderators = Array.from(groupCopy.moderators.values()).map((user) => {
+  const moderators = groupCopy.moderators.size > 0 ?  Array.from(groupCopy.moderators.values()).map((user) => {
     return {
       _id: user._id.toString(),
       username: user.username,
       dateJoined: formatDate(user.dateJoined),
     };
-  }); // remove password
+  }) : null; // remove password
 
   const owner = {
     _id: groupCopy.owner._id.toString(),
@@ -51,7 +51,7 @@ export const constructGroupResponse = (
     dateJoined: formatDate(groupCopy.owner.dateJoined),
   };
 
-  const freets = Array.from(groupCopy.freets.values()).map((freet) => {
+  const freets = groupCopy.freets.size > 0 ? Array.from(groupCopy.freets.values()).map((freet) => {
     return {
       _id: freet._id.toString(),
       author: freet.authorId.toString(),
@@ -59,7 +59,7 @@ export const constructGroupResponse = (
       dateCreated: formatDate(freet.dateCreated),
       dateModified: formatDate(freet.dateModified),
     };
-  });
+  }) : null;
 
   return {
     ...groupCopy,

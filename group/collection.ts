@@ -1,11 +1,9 @@
-import FreetCollection from "freet/collection";
-import { Freet } from "freet/model";
+import FreetCollection from "../freet/collection";
+import { Freet } from "../freet/model";
 import type { HydratedDocument, Types } from "mongoose";
-import { Schema, model } from "mongoose";
-import UserCollection from "user/collection";
+import UserCollection from "../user/collection";
 import type { Group } from "./model";
 import GroupModel from "./model";
-import UserModel from "./model";
 
 /**
  * This file contains a class with functionality to interact with groups stored
@@ -68,7 +66,7 @@ class GroupCollection {
   static async findOneByGroupName(
     name: string
   ): Promise<HydratedDocument<Group>> {
-    return GroupModel.findOne({ name: new RegExp(`^${name.trim()}$`, "i") });
+    return GroupModel.findOne({ name: name });
   }
 
   /**
