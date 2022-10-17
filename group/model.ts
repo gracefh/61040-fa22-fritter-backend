@@ -16,7 +16,7 @@ export type Group = {
   owner: User;
   moderators: Set<User>;
   members: Set<User>;
-  posts: Set<Freet>;
+  freets: Set<Freet>;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table
@@ -46,7 +46,7 @@ const GroupSchema = new Schema({
     type: [Schema.Types.ObjectId],
     required: true
   },
-  posts: {
+  freets: {
     type: [Schema.Types.ObjectId],
     required: true
   }

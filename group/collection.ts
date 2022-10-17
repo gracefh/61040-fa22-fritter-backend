@@ -32,7 +32,7 @@ class GroupCollection {
     const owner = creator;
     const moderators = new Set([creator]);
     const members = new Set([creator]);
-    const posts = new Set<Types.ObjectId>();
+    const freets = new Set<Types.ObjectId>();
 
     const group = new GroupModel({
       name,
@@ -40,7 +40,7 @@ class GroupCollection {
       owner,
       moderators,
       members,
-      posts,
+      freets,
     });
 
     await group.save(); // Saves group to MongoDB
@@ -89,12 +89,12 @@ class GroupCollection {
    * @return {Promise<Array<Freet>>} - An array of all of the freets
    */
   static async findAllFreets(groupId: string): Promise<Array<Freet>> {
-    // Retrieves posts and sorts them in backwards time order
+    // Retrieves freets and sorts them in backwards time order
     const group = await GroupCollection.findOneByGroupId(groupId);
     if (group === null) {
       return [];
     }
-    return Array.from(group.posts.values()).sort(
+    return Array.from(group.freets.values()).sort(
       (a, b) => b.dateCreated.getTime() - a.dateCreated.getTime()
     );
   }
@@ -116,13 +116,14 @@ class GroupCollection {
     if (group === null || freet === null)
       // group or freet doesn't exist
       return null;
-    group.posts.add(freet);
+    group.freets.add(freet);
 
     await group.save();
     return group;
   }
   /**
-   * Delete freet with given freet id from group with given group id. If freet 
+   * Delete freet with given freet id from group with given group id. If freet doesn't exist, is not in the group,
+   * or the group doesn't exist, return false. If the freet was successfully deleted, return true
    *
    * @param {string} freetId - freet Id of freet to delete from group
    * @param {string} groupId - group Id to delete freet from
@@ -132,17 +133,21 @@ class GroupCollection {
    static async deleteFreet(
     freetId: string,
     groupId: string
-  ): Promise<HydratedDocument<Group>> {
+  ): Promise<boolean> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const freet = await FreetCollection.findOne(freetId);
     if (group === null || freet === null)
       // group or freet doesn't exist
-      return null;
-    
-    group.posts.add(freet);
+      return false;
+
+    const freets = group.freets;
+    if (!freets.has(freet))
+      return false;
+
+    freets.delete(freet);
     
     await group.save();
-    return group;
+    return true;
   }
 
   /**
@@ -269,6 +274,8 @@ class GroupCollection {
     if (!group.moderators.has(user)) {
       group.moderators.add(user);
     }
+
+    await group.save();
     return true;
   }
 

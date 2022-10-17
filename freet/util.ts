@@ -3,7 +3,7 @@ import moment from 'moment';
 import type {Freet, PopulatedFreet} from '../freet/model';
 
 // Update this if you add a property to the Freet type!
-type FreetResponse = {
+export type FreetResponse = {
   _id: string;
   author: string;
   dateCreated: string;
@@ -17,7 +17,7 @@ type FreetResponse = {
  * @param {Date} date - A date object
  * @returns {string} - formatted date as string
  */
-const formatDate = (date: Date): string => moment(date).format('MMMM Do YYYY, h:mm:ss a');
+export const formatDate = (date: Date): string => moment(date).format('MMMM Do YYYY, h:mm:ss a');
 
 /**
  * Transform a raw Freet object from the database into an object
