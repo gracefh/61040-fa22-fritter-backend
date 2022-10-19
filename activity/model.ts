@@ -8,9 +8,11 @@ import { model, Schema, Types } from "mongoose";
 export type Activity = {
     _id: Types.ObjectId;    // MongoDB assigns each object this ID on creation
     user: Types.ObjectId;   // associated user
-    time_today: number;
-    average_time: number;
-    time_past_week: Array<number>;
+    timeToday: number;
+    averageTime: number;
+    timePastWeek: Array<number>;
+    currentlyActive: Boolean;
+    timeLastLoggedIn: Date;
   };
   
 
@@ -24,18 +26,28 @@ const ActivitySchema = new Schema({
       required: true
     },
     // The time active today
-    time_today: {
+    timeToday: {
       type: String,
       required: true
     },
     // Average time over the last week
-    average_time: {
+    averageTime: {
       type: Schema.Types.ObjectId,
       required: true
     },
     // Active times for the last week
-    time_past_week: {
+    timePastWeek: {
       type: [Schema.Types.ObjectId],
+      required: true
+    },
+    // Whether user is currently active or not
+    currentlyActive: {
+      type: Boolean,
+      required: true
+    },
+     // Active times for the last week
+     timeLastLoggedIn: {
+      type: Date,
       required: true
     },
   });

@@ -1,4 +1,5 @@
 import type { HydratedDocument, Types } from "mongoose";
+import UserCollection from "user/collection";
 import type { Activity } from "./model";
 import ActivityModel from "./model";
 
@@ -20,11 +21,15 @@ class ActivityCollection {
   static async createActivity(
     user_id: Types.ObjectId | string
   ): Promise<HydratedDocument<Activity>> {
+    const user = await UserCollection.findOneByUserId(user_id);
+
     const activity = new ActivityModel({
         user: user_id,
         time_today: 0,
         average_time: 0,
-        time_past_week: [0, 0, 0, 0, 0, 0, 0]
+        time_past_week: [0, 0, 0, 0, 0, 0, 0],
+        currently_active: true,
+        time_last_logged_in: user.dateJoined
     }
         
     )
