@@ -29,38 +29,6 @@ export const constructGroupResponse = (
     }),
   };
 
-  // const members = groupCopy.members.size > 0 ? Array.from(groupCopy.members.values()).map((user) => {
-  //   return {
-  //     _id: user._id.toString(),
-  //     username: user.username,
-  //     dateJoined: formatDate(user.dateJoined),
-  //   };
-  // }) : null; // remove password
-
-  // const moderators = groupCopy.moderators.size > 0 ?  Array.from(groupCopy.moderators.values()).map((user) => {
-  //   return {
-  //     _id: user._id.toString(),
-  //     username: user.username,
-  //     dateJoined: formatDate(user.dateJoined),
-  //   };
-  // }) : null; // remove password
-
-  // const owner = {
-  //   _id: groupCopy.owner._id.toString(),
-  //   username: groupCopy.owner.username,
-  //   dateJoined: formatDate(groupCopy.owner.dateJoined),
-  // };
-
-  // const freets = groupCopy.freets.size > 0 ? Array.from(groupCopy.freets.values()).map((freet) => {
-  //   return {
-  //     _id: freet._id.toString(),
-  //     author: freet.authorId.toString(),
-  //     content: freet.content,
-  //     dateCreated: formatDate(freet.dateCreated),
-  //     dateModified: formatDate(freet.dateModified),
-  //   };
-  // }) : null;
-
   return {
     ...groupCopy,
     _id: groupCopy._id.toString(),

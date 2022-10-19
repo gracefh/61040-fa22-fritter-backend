@@ -1,9 +1,14 @@
 import FreetCollection from "../freet/collection";
-import { Freet } from "../freet/model";
 import type { HydratedDocument, Types } from "mongoose";
 import UserCollection from "../user/collection";
 import type { Group } from "./model";
 import GroupModel from "./model";
+
+export enum Role {
+  Member = "member",
+  Moderator = "moderator",
+  Owner = "owner",
+}
 
 /**
  * This file contains a class with functionality to interact with groups stored
@@ -28,9 +33,9 @@ class GroupCollection {
     creator: Types.ObjectId | string
   ): Promise<HydratedDocument<Group>> {
     const owner = creator;
-    const moderators = new Set([creator]);
-    const members = new Set([creator]);
-    const freets = new Set<Types.ObjectId>();
+    const moderators = [creator];
+    const members = [creator];
+    const freets = new Array<Types.ObjectId>();
 
     const group = new GroupModel({
       name,
@@ -93,8 +98,35 @@ class GroupCollection {
     const user = await UserCollection.findOneByUserId(userId);
     const allGroups = await GroupCollection.findAll();
     return allGroups.filter(
-      (group) => group.members.size > 0 && group.members.has(user._id)
+      (group) => group.members.length > 0 && group.members.includes(user._id)
     );
+  }
+
+  /**
+   * Get all the groups in the database that a specified user is a member of and has a specified role in
+   * @param {Role} role - The role being queried for
+   * @param {string} userId - The id of the user to query
+   *
+   * @return {Promise<HydratedDocument<Group>[]>} - An array of all of the groups that the user is in such that the user
+   *                                                has the associated role, sorted alphabetically
+   */
+  static async findAllWithUserRole(
+    userId: string,
+    role: Role
+  ): Promise<Array<HydratedDocument<Group>>> {
+    const user = await UserCollection.findOneByUserId(userId);
+    const allGroups = await GroupCollection.findAll();
+
+    if (role === Role.Member)
+      return allGroups.filter(
+        (group) => group.members.length > 0 && group.members.includes(user._id)
+      );
+    else if (role === Role.Moderator)
+      return allGroups.filter(
+        (group) =>
+          group.moderators.length > 0 && group.moderators.includes(user._id)
+      );
+    return allGroups.filter((group) => group.owner === user._id);
   }
 
   /**
@@ -137,7 +169,7 @@ class GroupCollection {
     }
 
     // const freets = await Promise.all(Array.from(group.freets.values()).map(async (freetId) => await FreetCollection.findOne(freetId)));
-    return Array.from(group.freets.values());
+    return group.freets;
   }
 
   /**
@@ -157,7 +189,7 @@ class GroupCollection {
     if (group === null || freet === null)
       // group or freet doesn't exist
       return null;
-    group.freets.add(freet._id);
+    group.freets.push(freet._id);
 
     await group.save();
     return group;
@@ -180,9 +212,9 @@ class GroupCollection {
       return false;
 
     const freets = group.freets;
-    if (!freets.has(freet._id)) return false;
+    if (!freets.includes(freet._id)) return false;
 
-    freets.delete(freet._id);
+    freets.splice(freets.indexOf(freet._id), 1);
 
     await group.save();
     return true;
@@ -210,10 +242,10 @@ class GroupCollection {
       return null;
     if (userType == "member") {
       const members = group.members;
-      members.add(user._id);
+      members.push(user._id);
     } else if (userType == "moderator") {
       const moderators = group.moderators;
-      moderators.add(user._id);
+      moderators.push(user._id);
     } else {
       return null; // return null without doing anything if unexpected input
     }
@@ -241,15 +273,17 @@ class GroupCollection {
     if (group === null || user === null)
       // group or user doesn't exist
       return false;
+
+    const id = user._id;
     const members = group.members;
     const moderators = group.moderators;
-    if (!members.has(user._id) || group.owner === user._id)
+    if (!members.includes(id) || group.owner === id)
       // group doesn't have user or user is group owner
       return false;
 
-    members.delete(user._id);
-    if (moderators.has(user._id)) {
-      moderators.delete(user._id); // also remove from moderator position
+    members.splice(members.indexOf(id), 1);
+    if (moderators.includes(id)) {
+      moderators.splice(moderators.indexOf(id), 1); // also remove from moderator position
     }
 
     await group.save();
@@ -277,11 +311,11 @@ class GroupCollection {
       return false;
 
     const moderators = group.moderators;
-    if (!moderators.has(user._id) || group.owner === user._id)
+    if (!moderators.includes(user._id) || group.owner === user._id)
       // user is not moderator or user is group owner
       return false;
 
-    moderators.delete(user._id);
+    moderators.splice(moderators.indexOf(user._id), 1);
 
     await group.save();
     return true;
@@ -306,11 +340,11 @@ class GroupCollection {
       return false;
     }
     group.owner = user._id;
-    if (!group.members.has(user._id)) {
-      group.members.add(user._id);
+    if (!group.members.includes(user._id)) {
+      group.members.push(user._id);
     }
-    if (!group.moderators.has(user._id)) {
-      group.moderators.add(user._id);
+    if (!group.moderators.includes(user._id)) {
+      group.moderators.push(user._id);
     }
 
     await group.save();

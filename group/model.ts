@@ -1,22 +1,19 @@
-import type {Freet} from 'freet/model';
 import type {Types} from 'mongoose';
 import {Schema, model} from 'mongoose';
-import type {User} from 'user/model';
 
 /**
- * This file defines the properties stored in a User
- * DO NOT implement operations here ---> use collection file
+ * This file defines the properties stored in a Group
  */
 
-// Type definition for User on the backend
+// Type definition for Group on the backend
 export type Group = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   name: string;
   description: string;
   owner: Types.ObjectId;
-  moderators: Set<Types.ObjectId>;
-  members: Set<Types.ObjectId>;
-  freets: Set<Types.ObjectId>;
+  moderators: Array<Types.ObjectId>;
+  members: Array<Types.ObjectId>;
+  freets: Array<Types.ObjectId>;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table

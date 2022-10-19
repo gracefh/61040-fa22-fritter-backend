@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
-import GroupCollection from "./collection";
+import GroupCollection, { Role } from "./collection";
 import FreetCollection from "../freet/collection";
 import UserCollection from "./collection";
 import * as groupValidator from "../group/middleware";
@@ -92,7 +92,7 @@ router.delete(
     groupValidator.doesGroupParamExist,
   ],
   async (req: Request, res: Response) => {
-    const group = await GroupCollection.deleteOne(req.params.groupId);
+    await GroupCollection.deleteOne(req.params.groupId);
 
     res.status(200).json({
       message: `Your group has been deleted successfully`,
@@ -141,23 +141,47 @@ router.get(
 /**
  * Get all groups that current user is a member of
  *
- * @name GET /api/groups/membership
+ * @name GET /api/groups/member
  *
  * @return {GroupResponse[]} - group information for each group that the user is in
  * @throws {403} - If the user is not logged in
  *
  */
+/**
+ * Get all groups in which user is a member of and has corresponding role
+ *
+ * @name GET /api/groups/member?role=ROLE
+ *
+ * @return {GroupResponse} - An array of group details, with one entry for 
+ *                           every group in which the user has the corresponding role given in the query
+ * 
+ * @throws {403} if the user is not logged in
+ * @throws {400} if ROLE is not either 'member', 'moderator', or 'owner'
+ *
+ */
 router.get(
-  "/membership",
+  "/member",
   [userValidator.isUserLoggedIn],
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next:NextFunction) => {
+    if(req.query.role !== undefined)
+    {
+      next();
+      return;
+    }
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since its validated in isUserLoggedIn
     const groups = await GroupCollection.findAllWithUser(userId);
     const response = groups.map(util.constructGroupResponse);
 
     res.status(200).json(response);
+  }, 
+  [groupValidator.isRoleValid],
+  async (req: Request, res: Response) => {
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since its validated in isUserLoggedIn
+    const groups = await GroupCollection.findAllWithUserRole(userId, req.query.role as Role);
+    const response = groups.map(util.constructGroupResponse);
+
+    res.status(200).json(response);
   }
 );
-
 
 export {router as groupRouter};

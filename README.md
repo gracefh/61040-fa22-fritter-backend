@@ -358,7 +358,7 @@ This renders the `index.html` file that will be used to interact with the backen
 **Returns**
 - An array of group details
 
-#### `GET /api/groups/membership` - Get all groups the user is a member of
+#### `GET /api/groups/member` - Get all groups the user is a member of
 
 **Returns**
 - An array of group details, with one entry for every group the user is in

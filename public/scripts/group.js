@@ -3,7 +3,7 @@ function getAllGroups(fields) {
 }
 
 function getAllMemberGroups(fields) {
-  fetch("/api/groups/membership").then(showResponse).catch(showResponse);
+  fetch("/api/groups/member").then(showResponse).catch(showResponse);
 }
 
 function getGroupById(fields) {

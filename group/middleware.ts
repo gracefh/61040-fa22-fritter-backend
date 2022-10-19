@@ -1,6 +1,6 @@
-import type {Request, Response, NextFunction} from 'express';
+import {Request, Response, NextFunction, response} from 'express';
 import {Types} from 'mongoose';
-import GroupCollection from '../group/collection';
+import GroupCollection, { Role } from '../group/collection';
 
 /**
  * Checks if a group with groupId in req.params exists
@@ -80,6 +80,25 @@ const doesGroupParamExist = async (req: Request, res: Response, next: NextFuncti
     next();
   };
 
+const isRoleValid = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.query.role) {
+    res.status(400).json({
+      error: 'Provided role must be nonempty.'
+    });
+    return;
+  }
+
+  const role = req.query.role as string;
+  if (!Object.values(Role).includes(role as Role))
+  {
+    res.status(400).json({
+      error: `Role ${role} is not valid`
+    });
+    return;
+  }
+  next();
+}
+
 export {
-    doesGroupParamExist, doesGroupQueryExist, isGroupNameNotAlreadyInUse, isGroupOwner
+    doesGroupParamExist, doesGroupQueryExist, isGroupNameNotAlreadyInUse, isGroupOwner, isRoleValid
   };
