@@ -15,27 +15,55 @@ class ActivityCollection {
   /**
    * Create a new Activity
    *
-   * @param {Types.ObjectId | string} user_id - user id associated with activity tracker
+   * @param {Types.ObjectId | string} userId - user id associated with activity tracker
+   * @param {Boolean} currentlyActive - whether the user is currently logged in or not, defaults to false
+   * @param {Date} timeLastLoggedIn - the last time the user logged in, defaults to undefined
    * @return {Promise<HydratedDocument<Activity>>} - The newly created Activity object
    */
   static async createActivity(
-    user_id: Types.ObjectId | string
+    userId: Types.ObjectId | string,
+    currentlyActive: Boolean = false,
+    timeLastLoggedIn: Date = undefined
   ): Promise<HydratedDocument<Activity>> {
-    const user = await UserCollection.findOneByUserId(user_id);
+    const user = await UserCollection.findOneByUserId(userId);
+    const lastLoggedIn = timeLastLoggedIn ?? user.dateJoined;
 
     const activity = new ActivityModel({
-        user: user_id,
-        time_today: 0,
-        average_time: 0,
-        time_past_week: [0, 0, 0, 0, 0, 0, 0],
-        currently_active: true,
-        time_last_logged_in: user.dateJoined
-    }
-        
-    )
+      userId: userId,
+      timeToday: 0,
+      averageTime: 0,
+      timePastWeek: [0, 0, 0, 0, 0, 0, 0],
+      currentlyActive: currentlyActive,
+      timeLastLoggedIn: lastLoggedIn,
+    });
 
     await activity.save(); // Saves group to MongoDB
     return activity;
+  }
+
+  /**
+   * Find an Activity from its id
+   *
+   * @param {id} id - the id to query for
+   * @return {Promise<HydratedDocument<Activity>>} - The associated Activity object
+   */
+  static async findOne(
+    id: Types.ObjectId | string
+  ): Promise<HydratedDocument<Activity>> {
+    return ActivityModel.findOne({ _id: id });
+  }
+
+
+  /**
+   * Find an Activity from a user Id
+   *
+   * @param {userId} userId - the user id to query for
+   * @return {Promise<HydratedDocument<Activity>>} - The associated Activity object
+   */
+  static async findOneByUserId(
+    userId: Types.ObjectId | string
+  ): Promise<HydratedDocument<Activity>> {
+    return ActivityModel.findOne({ userId: userId });
   }
 }
 

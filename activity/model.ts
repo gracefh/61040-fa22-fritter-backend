@@ -7,7 +7,7 @@ import { model, Schema, Types } from "mongoose";
 // Type definition for Activity Monitor on the backend
 export type Activity = {
     _id: Types.ObjectId;    // MongoDB assigns each object this ID on creation
-    user: Types.ObjectId;   // associated user
+    userId: Types.ObjectId;   // associated user
     timeToday: number;
     averageTime: number;
     timePastWeek: Array<number>;
@@ -21,8 +21,8 @@ export type Activity = {
 // type given by the type property, inside MongoDB
 const ActivitySchema = new Schema({
     // The associated user
-    user: {
-      type: String,
+    userId: {
+      type: Schema.Types.ObjectId,
       required: true
     },
     // The time active today
@@ -32,12 +32,12 @@ const ActivitySchema = new Schema({
     },
     // Average time over the last week
     averageTime: {
-      type: Schema.Types.ObjectId,
+      type: Number,
       required: true
     },
     // Active times for the last week
     timePastWeek: {
-      type: [Schema.Types.ObjectId],
+      type: [Number],
       required: true
     },
     // Whether user is currently active or not

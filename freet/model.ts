@@ -50,6 +50,7 @@ const FreetSchema = new Schema<Freet>({
     type: Date,
     required: true
   }
+  // The group that the freet is associated with
 });
 
 const FreetModel = model<Freet>('Freet', FreetSchema);

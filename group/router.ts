@@ -152,9 +152,9 @@ router.get(
  *
  * @name GET /api/groups/member?role=ROLE
  *
- * @return {GroupResponse} - An array of group details, with one entry for 
+ * @return {GroupResponse} - An array of group details, with one entry for
  *                           every group in which the user has the corresponding role given in the query
- * 
+ *
  * @throws {403} if the user is not logged in
  * @throws {400} if ROLE is not either 'member', 'moderator', or 'owner'
  *
@@ -162,9 +162,8 @@ router.get(
 router.get(
   "/member",
   [userValidator.isUserLoggedIn],
-  async (req: Request, res: Response, next:NextFunction) => {
-    if(req.query.role !== undefined)
-    {
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (req.query.role !== undefined) {
       next();
       return;
     }
@@ -173,15 +172,20 @@ router.get(
     const response = groups.map(util.constructGroupResponse);
 
     res.status(200).json(response);
-  }, 
+  },
   [groupValidator.isRoleValid],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since its validated in isUserLoggedIn
-    const groups = await GroupCollection.findAllWithUserRole(userId, req.query.role as Role);
+    const groups = await GroupCollection.findAllWithUserRole(
+      userId,
+      req.query.role as Role
+    );
     const response = groups.map(util.constructGroupResponse);
 
     res.status(200).json(response);
   }
 );
 
-export {router as groupRouter};
+
+
+export { router as groupRouter };
