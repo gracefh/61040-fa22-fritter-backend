@@ -80,6 +80,63 @@ const doesGroupParamExist = async (req: Request, res: Response, next: NextFuncti
     next();
   };
 
+  
+  /**
+   * Checks if logged in user is not in group (specified in params). Throws error if the user already is in 
+   * the group
+   */
+const isUserNotInGroup = async (req: Request, res: Response, next: NextFunction) => {
+  const validFormat = Types.ObjectId.isValid(req.params.groupId);
+  const group = validFormat ? await GroupCollection.findOneByGroupId(req.params.groupId) : '';
+  if (!group) {
+    res.status(404).json({
+      error: {
+        groupNotFound: `Group with group ID ${req.params.groupId} does not exist.`
+      }
+    });
+    return;
+  }
+  if(group.members.includes(req.session.userId)){
+    res.status(409).json({
+      error: {
+        alreadyMember: `User with userId ${req.session.userId} is already in group ${req.params.groupId}.`
+      }
+    });
+    return;
+  }
+
+  next();
+}
+
+  /**
+   * Checks if logged in user is already in group (specified in params). Throws error if the user is not
+   */
+   const isUserInGroup = async (req: Request, res: Response, next: NextFunction) => {
+    const validFormat = Types.ObjectId.isValid(req.params.groupId);
+    const group = validFormat ? await GroupCollection.findOneByGroupId(req.params.groupId) : '';
+    if (!group) {
+      res.status(404).json({
+        error: {
+          groupNotFound: `Group with group ID ${req.params.groupId} does not exist.`
+        }
+      });
+      return;
+    }
+    if(!group.members.includes(req.session.userId)){
+      res.status(409).json({
+        error: {
+          alreadyMember: `User with userId ${req.session.userId} is not in group ${req.params.groupId}.`
+        }
+      });
+      return;
+    }
+  
+    next();
+  }
+
+  /**
+   * Checks if role is a valid role (member, moderator, or owner)
+   */
 const isRoleValid = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.query.role) {
     res.status(400).json({
@@ -100,5 +157,5 @@ const isRoleValid = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 export {
-    doesGroupParamExist, doesGroupQueryExist, isGroupNameNotAlreadyInUse, isGroupOwner, isRoleValid
+    doesGroupParamExist, doesGroupQueryExist, isGroupNameNotAlreadyInUse, isGroupOwner, isRoleValid, isUserInGroup, isUserNotInGroup
   };

@@ -224,15 +224,15 @@ class GroupCollection {
    * Add user with given user id to group with given group id, either as
    * a member or a moderator.
    *
-   * @param {string} userId - The id of the user to add to the group
-   * @param {string} groupId - The id of the group to add the user to
+   * @param {string | Types.ObjectId} userId - The id of the user to add to the group
+   * @param {string | Types.ObjectId} groupId - The id of the group to add the user to
    * @param {string} userType - Either 'member' or 'moderator', what role to add user to
    *                            (moderators are also users, but this eliminates unnecessary reuse of code)
    * @return {Promise<HydratedDocument<Group>>} - The updated group
    */
   static async addUser(
-    userId: string,
-    groupId: string,
+    userId: string | Types.ObjectId,
+    groupId: string | Types.ObjectId,
     userType: string
   ): Promise<HydratedDocument<Group>> {
     const group = await GroupCollection.findOneByGroupId(groupId);

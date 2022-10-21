@@ -1,11 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import GroupCollection, { Role } from "./collection";
-import FreetCollection from "../freet/collection";
-import UserCollection from "./collection";
 import * as groupValidator from "../group/middleware";
 import * as userValidator from "../user/middleware";
-import * as freetValidator from "../freet/middleware";
 import * as util from "./util";
 
 const router = express.Router();
@@ -25,7 +22,7 @@ router.post(
   "/",
   [userValidator.isUserLoggedIn, groupValidator.isGroupNameNotAlreadyInUse],
   async (req: Request, res: Response) => {
-    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since its validated in isUserLoggedIn
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
     const group = await GroupCollection.createGroup(
       req.body.name,
       req.body.description,
@@ -33,7 +30,7 @@ router.post(
     );
 
     res.status(201).json({
-      message: `Your group has been created succesfsfully`,
+      message: `Your group has been created successfully`,
       group: util.constructGroupResponse(group),
     });
   }
@@ -167,7 +164,7 @@ router.get(
       next();
       return;
     }
-    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since its validated in isUserLoggedIn
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
     const groups = await GroupCollection.findAllWithUser(userId);
     const response = groups.map(util.constructGroupResponse);
 
@@ -175,7 +172,7 @@ router.get(
   },
   [groupValidator.isRoleValid],
   async (req: Request, res: Response) => {
-    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since its validated in isUserLoggedIn
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
     const groups = await GroupCollection.findAllWithUserRole(
       userId,
       req.query.role as Role
@@ -186,6 +183,49 @@ router.get(
   }
 );
 
+/**
+ * Add a user to a group as a member
+ * 
+ * @name POST /api/groups/:groupId/member
+ * 
+ * @return {GroupResponse} - the updated group information
+ * 
+ * @throws {403} - if the user is not logged in
+ * @throws {404} - if the group Id does not exist
+ * @throws {409} - If the user is already a member of the group
+ */
+router.post(
+  "/:groupId/member",
+  [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserNotInGroup],
+  async (req: Request, res: Response) => {
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
+    const group = await GroupCollection.findOneByGroupId(req.params.groupId);
+    GroupCollection.addUser(userId, group._id, "member");
+    const response = util.constructGroupResponse(group);
 
+    res.status(200).json(response);
+  }
+);
+
+/**
+ * Delete a user from a group
+ * 
+ * @name DELETE /api/groups/:groupId/member
+ * 
+ * @throws {403} - if the user is not logged in
+ * @throws {404} - if the group Id does not exist
+ * @throws {409} - If the user is not a member of the group
+ */
+router.delete(
+  "/:groupId/member",
+  [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserInGroup],
+  async (req: Request, res: Response) => {
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
+    const group = await GroupCollection.findOneByGroupId(req.params.groupId);
+    GroupCollection.removeUserFromGroup(userId, group._id);
+
+    res.status(200).json({message:"Your group has been deleted successfully"});
+  }
+);
 
 export { router as groupRouter };
