@@ -1,3 +1,4 @@
+import { Group } from 'group/model';
 import type {Types, PopulatedDoc, Document} from 'mongoose';
 import {Schema, model} from 'mongoose';
 import type {User} from '../user/model';
@@ -14,6 +15,7 @@ export type Freet = {
   dateCreated: Date;
   content: string;
   dateModified: Date;
+  group?: Types.ObjectId;
 };
 
 export type PopulatedFreet = {
@@ -22,6 +24,7 @@ export type PopulatedFreet = {
   dateCreated: Date;
   content: string;
   dateModified: Date;
+  group?: Group;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table
@@ -49,8 +52,13 @@ const FreetSchema = new Schema<Freet>({
   dateModified: {
     type: Date,
     required: true
-  }
+  },
   // The group that the freet is associated with
+  group: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: 'Group'
+  }
 });
 
 const FreetModel = model<Freet>('Freet', FreetSchema);

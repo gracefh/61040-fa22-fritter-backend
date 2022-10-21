@@ -204,7 +204,7 @@ class GroupCollection {
    *
    * @return {boolean} - as described above
    */
-  static async deleteFreet(freetId: string, groupId: string): Promise<boolean> {
+  static async deleteFreet(freetId: string | Types.ObjectId, groupId: string | Types.ObjectId): Promise<boolean> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const freet = await FreetCollection.findOne(freetId);
     if (group === null || freet === null)
@@ -260,13 +260,13 @@ class GroupCollection {
    * be a group owner at all times. If the user isn't already in the group or the group doesn't exist, also
    * does nothing. If the deletion is unsuccessful (as outlined previously), return false. Otherwise, returns true
    *
-   * @param {string} userId - The id of the user to delete from the group
-   * @param {string} groupId - The id of the group to delete the user from
+   * @param {string | Types.ObjectId} userId - The id of the user to delete from the group
+   * @param {string | Types.ObjectId} groupId - The id of the group to delete the user from
    * @return {Promise<boolean>} - As described above
    */
   static async removeUserFromGroup(
-    userId: string,
-    groupId: string
+    userId: string | Types.ObjectId,
+    groupId: string | Types.ObjectId
   ): Promise<boolean> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const user = await UserCollection.findOneByUserId(userId);
@@ -326,13 +326,13 @@ class GroupCollection {
    * membership and moderator status, adds user to those two categories as well if the user isn't
    * already in them.
    *
-   * @param {string} userId - Id of user to transfer ownership to
-   * @param {string} groupId - Id of group to transfer ownership of
+   * @param {string | Types.ObjectId} userId - Id of user to transfer ownership to
+   * @param {string | Types.ObjectId} groupId - Id of group to transfer ownership of
    * @return {Promise<Boolean>} - true if ownership has been transferred; false otherwise
    */
   static async transferOwnership(
-    userId: string,
-    groupId: string
+    userId: string | Types.ObjectId,
+    groupId: string | Types.ObjectId
   ): Promise<boolean> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const user = await UserCollection.findOneByUserId(userId);
