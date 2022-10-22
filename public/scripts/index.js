@@ -45,7 +45,11 @@ const formsAndHandlers = {
   'delete-group': deleteGroup,
   'get-all-groups': getAllGroups,
   'get-all-member-groups': getAllMemberGroups,
-  'get-group-by-Id': getGroupById
+  'get-all-member-groups-with-role': getAllMemberGroupsWithRole,
+  'get-group-by-Id': getGroupById,
+  'join-group': joinGroup,
+  'leave-group': leaveGroup,
+  'post-freet-to-group': postFreetToGroup,
 };
 
 // Attach handlers to forms

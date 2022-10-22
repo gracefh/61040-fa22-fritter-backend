@@ -179,6 +179,15 @@
           <input type="submit" value="Get All Groups You're In">
         </form>
 
+        <form id="get-all-member-groups-with-role">
+          <h3>Get All Groups You're In With Specified Role</h3>
+          <div>
+            <label for="role">Role:</label>
+            <input id="role" name="role">
+          </div>
+          <input type="submit" value="Get All Groups You're In With Specified Role">
+        </form>
+
         <form id="get-group-by-Id">
           <h3>Get Group By Id</h3>
           <div>
@@ -186,6 +195,35 @@
             <input id="groupId" name="groupId">
           </div>
           <input type="submit" value="Get Group By Id">
+        </form>
+
+        <form id="join-group">
+          <h3>Join Group</h3>
+          <div>
+            <label for="groupId">Group Id:</label>
+            <input id="groupId" name="groupId">
+          </div>
+          <input type="submit" value="Join Group">
+        </form>
+
+        <form id="leave-group">
+          <h3>Leave Group</h3>
+          <div>
+            <label for="groupId">Group Id:</label>
+            <input id="groupId" name="groupId">
+          </div>
+          <input type="submit" value="Leave Group">
+        </form>
+
+        <form id="post-freet-to-group">
+          <h3>Post Freet To Group</h3>
+          <div>
+            <label for="groupId">Group Id:</label>
+            <input id="groupId" name="groupId">
+            <label for="content">Content:</label>
+            <textarea id="content" name="content"></textarea>
+          </div>
+          <input type="submit" value="Post Freet To Group">
         </form>
       </div>
     </section>

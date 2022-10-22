@@ -181,8 +181,8 @@ class GroupCollection {
    * @return {Promise<HydratedDocument<Group>>} - the updated group
    */
   static async addFreet(
-    freetId: string,
-    groupId: string
+    freetId: string | Types.ObjectId,
+    groupId: string | Types.ObjectId
   ): Promise<HydratedDocument<Group>> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const freet = await FreetCollection.findOne(freetId);

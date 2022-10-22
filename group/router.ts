@@ -3,7 +3,9 @@ import express from "express";
 import GroupCollection, { Role } from "./collection";
 import * as groupValidator from "../group/middleware";
 import * as userValidator from "../user/middleware";
+import * as freetValidator from "../freet/middleware";
 import * as util from "./util";
+import FreetCollection from "../freet/collection";
 
 const router = express.Router();
 
@@ -184,7 +186,7 @@ router.get(
 );
 
 /**
- * Add a user to a group as a member
+ * Join a group
  * 
  * @name POST /api/groups/:groupId/member
  * 
@@ -200,7 +202,7 @@ router.post(
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
     const group = await GroupCollection.findOneByGroupId(req.params.groupId);
-    GroupCollection.addUser(userId, group._id, "member");
+    await GroupCollection.addUser(userId, group._id, "member");
     const response = util.constructGroupResponse(group);
 
     res.status(200).json(response);
@@ -208,7 +210,7 @@ router.post(
 );
 
 /**
- * Delete a user from a group
+ * Leave a group
  * 
  * @name DELETE /api/groups/:groupId/member
  * 
@@ -222,9 +224,40 @@ router.delete(
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
     const group = await GroupCollection.findOneByGroupId(req.params.groupId);
-    GroupCollection.removeUserFromGroup(userId, group._id);
+    await GroupCollection.removeUserFromGroup(userId, group._id);
 
-    res.status(200).json({message:"Your group has been deleted successfully"});
+    res.status(200).json({message:"You've left the group successfully.'"});
+  }
+);
+
+/**
+ * Post a freet to a group
+ * 
+ * @name POST /api/groups/:groupId/freets
+ * 
+ * @return The updated group details of the group with name groupId
+ * 
+ * @param {string} content - The content of the freet 
+ * 
+ * @throws {403} - if the user is not logged in
+ * @throws {403} - if the user is not in the group
+ * @throws {404} - if the group Id does not exist
+ * @throws {409} - If the user is not a member of the group
+ * @throws {400} - If the freet content is empty or a stream of empty spaces
+ * @throws {413} - If the freet content is more than 140 characters long
+ */
+ router.post(
+  "/:groupId/freets",
+  [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserInGroup, freetValidator.isValidFreetContent],
+  async (req: Request, res: Response) => {
+    const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
+    const group = await GroupCollection.findOneByGroupId(req.params.groupId);
+    const freet = await FreetCollection.addOne(userId, req.body.content);
+    await GroupCollection.addFreet(freet._id, group._id);
+
+    const response = util.constructGroupResponse(group);
+
+    res.status(201).json(response);
   }
 );
 
