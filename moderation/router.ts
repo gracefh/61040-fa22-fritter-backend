@@ -25,7 +25,7 @@ router.get(
       next();
       return;
     }
-    res.status(200).json({ message: "NOT IMPLEMENTED YET" });
+    res.status(400).json({ message: "groupId not given" });
   },
   [groupValidator.doesGroupQueryExist],
   async (req: Request, res: Response) => {
@@ -33,10 +33,7 @@ router.get(
       req.query.groupId as string
     );
 
-    console.log("I'm finally here");
-
     const response = moderationArray.map(util.constructModerationResponse);
-    // const response = moderationArray.map((moderator) => moderator._id);
 
     res.status(200).json(response);
   }

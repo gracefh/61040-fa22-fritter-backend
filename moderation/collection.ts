@@ -89,6 +89,8 @@ class ModerationCollection {
    * Delete one Moderation object based on id
    *
    * @param id  Id of the Moderation object to delete
+   *
+   * @returns true if deletion was successful; false otherwise
    */
   static async deleteOne(id: Types.ObjectId | string): Promise<boolean> {
     const moderation = await ModerationModel.deleteOne({ _id: id });
@@ -110,6 +112,19 @@ class ModerationCollection {
       userId: userId,
     });
     return moderation !== null;
+  }
+
+  /**
+   * Delete all Moderation objects associated with group Id
+   *
+   * @param groupId Group Id of the Moderation objects to delete
+   */
+  static async deleteAllForGroup(
+    groupId: Types.ObjectId | string
+  ): Promise<void> {
+    await ModerationModel.deleteMany({
+      groupId: groupId,
+    });
   }
 
   /**

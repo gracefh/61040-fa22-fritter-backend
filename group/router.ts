@@ -38,66 +38,6 @@ router.post(
   }
 );
 
-/**
- * Update an existing group's information
- *
- * @name PUT /api/groups/:groupId
- *
- * @param {string} name - updated name of the group
- * @param {string} description - updated description of the group
- * @return {GroupResponse} - The updated group
- * @throws {403} - If user is not logged in
- * @throws {403} - If user is not owner of group with groupId
- * @throws {404} - If group not found
- * @throws {409} - If group already in use
- *
- */
-router.put(
-  "/:groupId?",
-  [
-    userValidator.isUserLoggedIn,
-    groupValidator.isGroupOwner,
-    groupValidator.doesGroupParamExist,
-    groupValidator.isGroupNameNotAlreadyInUse,
-  ],
-  async (req: Request, res: Response) => {
-    const group = await GroupCollection.updateOne(req.params.groupId, req.body);
-
-    res.status(200).json({
-      message: `Your group has been updated successfully`,
-      group: util.constructGroupResponse(group),
-    });
-  }
-);
-
-/**
- * Delete an existing group
- *
- * @name DELETE /api/groups/:groupId
- *
- * @param {string} name - updated name of the group
- * @param {string} description - updated description of the group
- * @return {GroupResponse} - The updated group
- * @throws {403} - If user is not logged in
- * @throws {403} - If user is not owner of group with groupId
- * @throws {404} - If group not found
- *
- */
-router.delete(
-  "/:groupId?",
-  [
-    userValidator.isUserLoggedIn,
-    groupValidator.isGroupOwner,
-    groupValidator.doesGroupParamExist,
-  ],
-  async (req: Request, res: Response) => {
-    await GroupCollection.deleteOne(req.params.groupId);
-
-    res.status(200).json({
-      message: `Your group has been deleted successfully`,
-    });
-  }
-);
 
 /**
  * Get all groups

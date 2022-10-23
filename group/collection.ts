@@ -4,6 +4,8 @@ import UserCollection from "../user/collection";
 import type { Group } from "./model";
 import GroupModel from "./model";
 import ModerationCollection from "../moderation/collection";
+import OwnerCollection from "../owner/collection";
+import { Owner } from "../owner/model";
 
 export enum Role {
   Member = "member",
@@ -48,7 +50,7 @@ class GroupCollection {
     });
 
     await ModerationCollection.addModeration(group._id, creator);
-    // TODO: add to owner object
+    await OwnerCollection.addOwner(group._id, creator);
 
     await group.save(); // Saves group to MongoDB
     return group;
@@ -271,6 +273,7 @@ class GroupCollection {
     } else if (userType == "moderator") {
       const moderators = group.moderators;
       moderators.push(user._id);
+      ModerationCollection.addModeration(group._id, user._id);
     } else {
       return null; // return null without doing anything if unexpected input
     }
@@ -355,27 +358,29 @@ class GroupCollection {
    *
    * @param {string | Types.ObjectId} userId - Id of user to transfer ownership to
    * @param {string | Types.ObjectId} groupId - Id of group to transfer ownership of
-   * @return {Promise<Boolean>} - true if ownership has been transferred; false otherwise
+   * @return {Promise<Owner>} - updated Owner object corresponding to group
    */
   static async transferOwnership(
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId
-  ): Promise<boolean> {
+  ): Promise<HydratedDocument<Owner>> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const user = await UserCollection.findOneByUserId(userId);
-    if (group === null || user === null) {
-      return false;
-    }
     group.owner = user._id;
+
+    const ownerObj = await OwnerCollection.findOneByGroupId(group._id);
+    const owner = await OwnerCollection.updateUserId(ownerObj._id, user._id);
+
     if (!group.members.includes(user._id)) {
       group.members.push(user._id);
     }
     if (!group.moderators.includes(user._id)) {
       group.moderators.push(user._id);
+      ModerationCollection.addModeration(group._id, user._id);
     }
 
     await group.save();
-    return true;
+    return owner;
   }
 
   /**

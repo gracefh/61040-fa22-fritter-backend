@@ -28,32 +28,6 @@ function createGroup(fields) {
     .catch(showResponse);
 }
 
-function changeGroupName(fields) {
-  fetch(`/api/groups/${fields.groupId}`, {
-    method: "PUT",
-    body: JSON.stringify(fields),
-    headers: { "Content-Type": "application/json" },
-  })
-    .then(showResponse)
-    .catch(showResponse);
-}
-
-function changeGroupDescription(fields) {
-  fetch(`/api/groups/${fields.groupId}`, {
-    method: "PUT",
-    body: JSON.stringify(fields),
-    headers: { "Content-Type": "application/json" },
-  })
-    .then(showResponse)
-    .catch(showResponse);
-}
-
-// TODO: MOVE TO OWNER
-function deleteGroup(fields) {
-  fetch(`/api/groups/${fields.groupId}`, { method: "DELETE" })
-    .then(showResponse)
-    .catch(showResponse);
-}
 
 // Join a group
 function joinGroup(fields) {

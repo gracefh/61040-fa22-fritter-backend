@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Request, Response, NextFunction } from "express";
 import FreetCollection from "../freet/collection";
 import { Types } from "mongoose";
 import UserCollection from "../user/collection";
