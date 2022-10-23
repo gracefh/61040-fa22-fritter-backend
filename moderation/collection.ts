@@ -79,7 +79,7 @@ class ModerationCollection {
   static async findOneByGroupAndUser(
     userId: Types.ObjectId | string,
     groupId: Types.ObjectId | string
-  ): Promise<Array<HydratedDocument<Moderation>>> {
+  ): Promise<HydratedDocument<Moderation>> {
     return ModerationModel.findOne({ groupId: groupId, userId: userId })
       .populate("groupId")
       .populate("userId");
@@ -96,9 +96,26 @@ class ModerationCollection {
   }
 
   /**
+   * Delete one Moderation object based on user Id and Group
+   *
+   * @param userId  User Id of the Moderation object to delete
+   * @param groupId Group Id of the Moderation object to delete
+   */
+  static async deleteOneByUserIdAndGroupId(
+    userId: Types.ObjectId | string,
+    groupId: Types.ObjectId | string
+  ): Promise<boolean> {
+    const moderation = await ModerationModel.deleteOne({
+      groupId: groupId,
+      userId: userId,
+    });
+    return moderation !== null;
+  }
+
+  /**
    * Remove a freet from a group, given the group Id of the group to remove it from, user Id of the user
    * that is performing the deletion, and the freetId of the freet to remove.
-   * 
+   *
    *
    * @param groupId     Id of the group to delete freet from
    * @param moderatorId Id of user performing the deletion
@@ -112,13 +129,15 @@ class ModerationCollection {
     moderatorId: Types.ObjectId | string,
     freetId: Types.ObjectId | string
   ): Promise<boolean> {
-    const moderation = await ModerationCollection.findOneByGroupAndUser(groupId, moderatorId);
+    const moderation = await ModerationCollection.findOneByGroupAndUser(
+      groupId,
+      moderatorId
+    );
     const freet = await FreetCollection.findOne(freetId);
     const group = await GroupCollection.findOneByGroupId(groupId);
-    
-    if (moderation == null || freet == null || group == null)
-    {
-        return false;
+
+    if (moderation == null || freet == null || group == null) {
+      return false;
     }
     delete freet.group;
     return await GroupCollection.deleteFreet(freetId, groupId);
@@ -127,10 +146,10 @@ class ModerationCollection {
   /**
    * Remove a user from a group, given the group Id of the group to remove it from, the user Id of the user
    * that is performing the deletion, and the user Id of the user to delete.
-   * 
+   *
    * The removal will not go through if user performing the removal is not a moderator of the group
    * or the user being removed is a moderator as well (or the user is not a member of the group in the first place)
-   * 
+   *
    *
    * @param groupId     Id of the group to delete freet from
    * @param moderatorId Id of user performing the removal
@@ -138,20 +157,30 @@ class ModerationCollection {
    *
    * @returns If the removal is successful, return true. If it does not go through or is otherwise unsuccessful, return false.
    */
-   static async removeGroupUser(
+  static async removeGroupUser(
     groupId: Types.ObjectId | string,
     moderatorId: Types.ObjectId | string,
     userId: Types.ObjectId | string
   ): Promise<boolean> {
-    const moderation = await ModerationCollection.findOneByGroupAndUser(groupId, moderatorId);
+    const moderation = await ModerationCollection.findOneByGroupAndUser(
+      groupId,
+      moderatorId
+    );
 
     const user = await UserCollection.findOneByUserId(userId);
-    const userModStatus = await ModerationCollection.findOneByGroupAndUser(groupId, userId);
+    const userModStatus = await ModerationCollection.findOneByGroupAndUser(
+      groupId,
+      userId
+    );
     const group = await GroupCollection.findOneByGroupId(groupId);
-    
-    if (moderation == null || user == null || group == null || userModStatus !== null)
-    {
-        return false;
+
+    if (
+      moderation == null ||
+      user == null ||
+      group == null ||
+      userModStatus !== null
+    ) {
+      return false;
     }
 
     return await GroupCollection.removeUserFromGroup(userId, groupId);

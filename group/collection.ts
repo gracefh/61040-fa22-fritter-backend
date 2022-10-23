@@ -96,13 +96,31 @@ class GroupCollection {
    * @return {Promise<HydratedDocument<Group>[]>} - An array of all of the groups that the user is in, sorted alphabetically
    */
   static async findAllWithUser(
-    userId: string
+    userId: string | Types.ObjectId
   ): Promise<Array<HydratedDocument<Group>>> {
     // Retrieves groups and sorts them in alphabetical order
     const user = await UserCollection.findOneByUserId(userId);
     const allGroups = await GroupCollection.findAll();
     return allGroups.filter(
       (group) => group.members.length > 0 && group.members.includes(user._id)
+    );
+  }
+
+  /**
+   * Delete user from all groups that the user is part of
+   *
+   * @param {string} userId - The id of the user to query
+   *
+   * @return {Promise<void>}
+   */
+  static async deleteUserFromAllGroups(
+    userId: string | Types.ObjectId
+  ): Promise<void> {
+    const groups = await this.findAllWithUser(userId);
+    await Promise.all(
+      groups.map((group) =>
+        GroupCollection.removeUserFromGroup(userId, group._id)
+      )
     );
   }
 
@@ -208,7 +226,10 @@ class GroupCollection {
    *
    * @return {boolean} - as described above
    */
-  static async deleteFreet(freetId: string | Types.ObjectId, groupId: string | Types.ObjectId): Promise<boolean> {
+  static async deleteFreet(
+    freetId: string | Types.ObjectId,
+    groupId: string | Types.ObjectId
+  ): Promise<boolean> {
     const group = await GroupCollection.findOneByGroupId(groupId);
     const freet = await FreetCollection.findOne(freetId);
     if (group === null || freet === null)
@@ -288,6 +309,7 @@ class GroupCollection {
     members.splice(members.indexOf(id), 1);
     if (moderators.includes(id)) {
       moderators.splice(moderators.indexOf(id), 1); // also remove from moderator position
+      await ModerationCollection.deleteOneByUserIdAndGroupId(id, groupId);
     }
 
     await group.save();
@@ -320,6 +342,7 @@ class GroupCollection {
       return false;
 
     moderators.splice(moderators.indexOf(user._id), 1);
+    await ModerationCollection.deleteOneByUserIdAndGroupId(userId, groupId);
 
     await group.save();
     return true;
