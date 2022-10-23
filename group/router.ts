@@ -197,7 +197,7 @@ router.get(
  * @throws {409} - If the user is already a member of the group
  */
 router.post(
-  "/:groupId/member",
+  "/:groupId?/member",
   [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserNotInGroup],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
@@ -219,7 +219,7 @@ router.post(
  * @throws {409} - If the user is not a member of the group
  */
 router.delete(
-  "/:groupId/member",
+  "/:groupId?/member",
   [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserInGroup],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
@@ -247,8 +247,8 @@ router.delete(
  * @throws {413} - If the freet content is more than 140 characters long
  */
  router.post(
-  "/:groupId/freets",
-  [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserInGroup, freetValidator.isValidFreetContent],
+  "/:groupId?/freets",
+  [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserInGroup, freetValidator.isValidFreetContent, userValidator.isCurrentSessionUserExists],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
     const group = await GroupCollection.findOneByGroupId(req.params.groupId);
