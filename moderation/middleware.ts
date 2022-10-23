@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, response } from "express";
-import GroupCollection from "group/collection";
-import ModerationCollection from "moderation/collection";
+import GroupCollection from "../group/collection";
+import ModerationCollection from "../moderation/collection";
 import { Types } from "mongoose";
 
 /**

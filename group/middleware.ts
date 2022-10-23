@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, response } from "express";
-import FreetCollection from "freet/collection";
+import FreetCollection from "../freet/collection";
 import { Types } from "mongoose";
-import UserCollection from "user/collection";
+import UserCollection from "../user/collection";
 import GroupCollection, { Role } from "../group/collection";
 
 /**
@@ -38,7 +38,7 @@ const doesGroupQueryExist = async (
 ) => {
   if (!req.query.groupId) {
     res.status(400).json({
-      error: "Provided group Id must be nonempty.",
+      error: 'Provided group Id must be nonempty.'
     });
     return;
   }
@@ -167,10 +167,10 @@ const isUserInGroup = async (
 };
 
 /**
- * Checks if user specified in request parameters is already in group (specified in params). 
+ * Checks if user specified in request parameters is already in group (specified in params).
  * Returns error if the user is not
  */
- const isUserParamInGroup = async (
+const isUserParamInGroup = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -180,7 +180,9 @@ const isUserInGroup = async (
   const group = validFormat
     ? await GroupCollection.findOneByGroupId(req.params.groupId)
     : "";
-  const user = validFormat ? await UserCollection.findOneByUserId(req.params.userId) : "";
+  const user = validFormat
+    ? await UserCollection.findOneByUserId(req.params.userId)
+    : "";
   if (!group) {
     res.status(404).json({
       error: {
@@ -192,8 +194,8 @@ const isUserInGroup = async (
   if (!user) {
     res.status(404).json({
       error: {
-        userNotFound: `User with user ID ${req.params.userId} does not exist.`
-      }
+        userNotFound: `User with user ID ${req.params.userId} does not exist.`,
+      },
     });
     return;
   }

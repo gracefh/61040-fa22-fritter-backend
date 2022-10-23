@@ -3,6 +3,7 @@ import type { HydratedDocument, Types } from "mongoose";
 import UserCollection from "../user/collection";
 import type { Group } from "./model";
 import GroupModel from "./model";
+import ModerationCollection from "../moderation/collection";
 
 export enum Role {
   Member = "member",
@@ -45,6 +46,9 @@ class GroupCollection {
       members,
       freets,
     });
+
+    await ModerationCollection.addModeration(group._id, creator);
+    // TODO: add to owner object
 
     await group.save(); // Saves group to MongoDB
     return group;

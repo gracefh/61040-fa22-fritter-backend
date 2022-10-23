@@ -2,7 +2,7 @@ import type { HydratedDocument, Types } from "mongoose";
 import type { Freet } from "./model";
 import FreetModel from "./model";
 import UserCollection from "../user/collection";
-import GroupCollection from "group/collection";
+import GroupCollection from "../group/collection";
 
 /**
  * This files contains a class that has the functionality to explore freets

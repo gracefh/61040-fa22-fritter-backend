@@ -1,7 +1,7 @@
-import FreetCollection from "freet/collection";
-import GroupCollection from "group/collection";
+import FreetCollection from "../freet/collection";
+import GroupCollection from "../group/collection";
 import type { HydratedDocument, Types } from "mongoose";
-import UserCollection from "user/collection";
+import UserCollection from "../user/collection";
 import ModerationModel, { Moderation } from "./model";
 
 class ModerationCollection {

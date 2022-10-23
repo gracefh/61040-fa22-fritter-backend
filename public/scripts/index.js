@@ -50,6 +50,9 @@ const formsAndHandlers = {
   'join-group': joinGroup,
   'leave-group': leaveGroup,
   'post-freet-to-group': postFreetToGroup,
+  'get-all-moderators-for-group': getModeratorsForGroup,
+  'remove-freet-from-group': removeFreetFromGroup,
+  'remove-user-from-group': removeUserFromGroup
 };
 
 // Attach handlers to forms

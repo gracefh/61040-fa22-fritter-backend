@@ -6,31 +6,39 @@ import * as userValidator from "../user/middleware";
 import * as freetValidator from "../freet/middleware";
 import * as moderationValidator from "../moderation/middleware";
 import * as util from "./util";
-import GroupCollection from "group/collection";
+import GroupCollection from "../group/collection";
 
 const router = express.Router();
 
 /**
- * Get all moderators for group associated with one groupId. Returns list of user Id's, one for each moderator of the group
+ * Get all moderators for group associated with one groupId. Returns list of Moderator information, one for each moderator of the group
  *
- * @name POST /api/moderation/groups?groupId=ID
+ * @name GET /api/moderation/groups?groupId=ID
  *
  * @throws {400} if groupId is not given
  * @throws {404} if group doesn't exist
  */
 router.get(
-  "/groups?groupId=ID",
+  "/groups",
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (req.query.groupId !== undefined) {
+      next();
+      return;
+    }
+    res.status(200).json({ message: "NOT IMPLEMENTED YET" });
+  },
   [groupValidator.doesGroupQueryExist],
   async (req: Request, res: Response) => {
     const moderationArray = await ModerationCollection.findAllByGroup(
       req.query.groupId as string
     );
 
-    const moderators = moderationArray.map((moderator) => moderator.userId);
+    console.log("I'm finally here");
 
-    res.status(200).json({
-      moderators: moderators,
-    });
+    const response = moderationArray.map(util.constructModerationResponse);
+    // const response = moderationArray.map((moderator) => moderator._id);
+
+    res.status(200).json(response);
   }
 );
 
@@ -95,3 +103,5 @@ router.delete(
     });
   }
 );
+
+export { router as moderationRouter };

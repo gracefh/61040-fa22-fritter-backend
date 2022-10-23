@@ -201,8 +201,8 @@ router.post(
   [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserNotInGroup],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
-    const group = await GroupCollection.findOneByGroupId(req.params.groupId);
-    await GroupCollection.addUser(userId, group._id, "member");
+    let group = await GroupCollection.findOneByGroupId(req.params.groupId);
+    group = await GroupCollection.addUser(userId, group._id, "member");
     const response = util.constructGroupResponse(group);
 
     res.status(200).json(response);
@@ -251,9 +251,9 @@ router.delete(
   [userValidator.isUserLoggedIn, groupValidator.doesGroupParamExist, groupValidator.isUserInGroup, freetValidator.isValidFreetContent, userValidator.isCurrentSessionUserExists],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ""; // Will not be an empty string since it's validated in isUserLoggedIn
-    const group = await GroupCollection.findOneByGroupId(req.params.groupId);
+    let group = await GroupCollection.findOneByGroupId(req.params.groupId);
     const freet = await FreetCollection.addOne(userId, req.body.content);
-    await GroupCollection.addFreet(freet._id, group._id);
+    group = await GroupCollection.addFreet(freet._id, group._id);
 
     const response = util.constructGroupResponse(group);
 

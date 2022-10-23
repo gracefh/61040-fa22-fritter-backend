@@ -8,6 +8,7 @@
   <script src="/scripts/freet.js"></script>
   <script src="/scripts/user.js"></script>
   <script src="/scripts/group.js"></script>
+  <script src="/scripts/moderation.js"></script>
   <script src="/scripts/index.js"></script>
 </head>
 
@@ -75,9 +76,9 @@
         </form>
 
         <form id="view-all-freets">
-            <h3>View All Freets</h3>
-            <input type="submit" value="View All Freets">
-          </form>
+          <h3>View All Freets</h3>
+          <input type="submit" value="View All Freets">
+        </form>
 
         <form id="view-freets-by-author">
           <h3>View Freets By Author</h3>
@@ -120,7 +121,7 @@
         </form>
 
         <!-- GROUP MODIFIERS -->
-        
+
         <form id="create-group">
           <h3>Create Group</h3>
           <div>
@@ -168,7 +169,7 @@
           </div>
           <input type="submit" value="Delete Group">
         </form>
-        
+
         <form id="get-all-groups">
           <h3>Get All Groups</h3>
           <input type="submit" value="Get All Groups">
@@ -224,6 +225,39 @@
             <textarea id="content" name="content"></textarea>
           </div>
           <input type="submit" value="Post Freet To Group">
+        </form>
+        
+        <!-- MODERATION MODIFIERS -->
+
+        <form id="get-all-moderators-for-group">
+          <h3>Get All Moderators For Group</h3>
+          <div>
+            <label for="groupId">Group Id:</label>
+            <input id="groupId" name="groupId">
+          </div>
+          <input type="submit" value="Get All Moderators For Group">
+        </form>
+
+        <form id="remove-freet-from-group">
+          <h3>Remove Freet From Group</h3>
+          <div>
+            <label for="groupId">Group Id:</label>
+            <input id="groupId" name="groupId">
+            <label for="freetId">Freet Id:</label>
+            <input id="freetId" name="freetId">
+          </div>
+          <input type="submit" value="Remove Freet From Group">
+        </form>
+
+        <form id="remove-user-from-group">
+          <h3>Remove User From Group</h3>
+          <div>
+            <label for="groupId">Group Id:</label>
+            <input id="groupId" name="groupId">
+            <label for="userId">User Id:</label>
+            <input id="userId" name="userId">
+          </div>
+          <input type="submit" value="Remove User From Group">
         </form>
       </div>
     </section>

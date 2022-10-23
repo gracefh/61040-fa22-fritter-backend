@@ -7,7 +7,9 @@ function getAllMemberGroups(fields) {
 }
 
 function getAllMemberGroupsWithRole(fields) {
-  fetch("/api/groups/member").then(showResponse).catch(showResponse);
+  fetch(`/api/groups/member?role=${fields.role}`)
+    .then(showResponse)
+    .catch(showResponse);
 }
 
 function getGroupById(fields) {
