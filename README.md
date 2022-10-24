@@ -1,3 +1,355 @@
+## API routes
+
+#### `GET /`
+
+This renders the `index.html` file that will be used to interact with the backend
+
+#### `GET /api/freets` - Get all the freets
+
+**Returns**
+
+- An array of all freets sorted in descending order by date modified
+
+#### `GET /api/freets?author=USERNAME` - Get freets by author
+
+**Returns**
+
+- An array of freets created by user with username `author`
+
+**Throws**
+
+- `400` if `author` is not given
+- `404` if `author` is not a recognized username of any user
+
+#### `POST /api/freets` - Create a new freet
+
+**Body**
+
+- `content` _{string}_ - The content of the freet
+
+**Returns**
+
+- A success message
+- A object with the created freet
+
+**Throws**
+
+- `403` if the user is not logged in
+- `400` If the freet content is empty or a stream of empty spaces
+- `413` If the freet content is more than 140 characters long
+
+#### `DELETE /api/freets/:freetId?` - Delete an existing freet
+
+**Returns**
+
+- A success message
+
+**Throws**
+
+- `403` if the user is not logged in
+- `403` if the user is not the author of the freet
+- `404` if the freetId is invalid
+
+#### `PUT /api/freets/:freetId?` - Update an existing freet
+
+**Body**
+
+- `content` _{string}_ - The new content of the freet
+
+**Returns**
+
+- A success message
+- An object with the updated freet
+
+**Throws**
+
+- `403` if the user is not logged in
+- `404` if the freetId is invalid
+- `403` if the user is not the author of the freet
+- `400` if the new freet content is empty or a stream of empty spaces
+- `413` if the new freet content is more than 140 characters long
+
+#### `POST /api/users/session` - Sign in user
+
+**Body**
+
+- `username` _{string}_ - The user's username
+- `password` _{string}_ - The user's password
+
+**Returns**
+
+- A success message
+- An object with user's details (without password)
+
+**Throws**
+
+- `403` if the user is already logged in
+- `400` if username or password is not in correct format format or missing in the req
+- `401` if the user login credentials are invalid
+
+#### `DELETE /api/users/session` - Sign out user
+
+**Returns**
+
+- A success message
+
+**Throws**
+
+- `403` if user is not logged in
+
+#### `POST /api/users` - Create an new user account
+
+**Body**
+
+- `username` _{string}_ - The user's username
+- `password` _{string}_ - The user's password
+
+**Returns**
+
+- A success message
+- An object with the created user's details (without password)
+
+**Throws**
+
+- `403` if there is a user already logged in
+- `400` if username or password is in the wrong format
+- `409` if username is already in use
+
+#### `PUT /api/users` - Update a user's profile
+
+**Body** _(no need to add fields that are not being changed)_
+
+- `username` _{string}_ - The user's username
+- `password` _{string}_ - The user's password
+
+**Returns**
+
+- A success message
+- An object with the update user details (without password)
+
+**Throws**
+
+- `403` if the user is not logged in
+- `400` if username or password is in the wrong format
+- `409` if the username is already in use
+
+#### `DELETE /api/users` - Delete user
+
+**Returns**
+
+- A success message
+
+**Throws**
+
+- `403` if the user is not logged in
+
+## Group
+
+#### `POST /api/groups` -- create a new group
+
+**Body**
+- `name` _{string}_ - The group's name
+- `description` _{string}_ - The group's description
+
+**Returns**
+- A success message
+- An object with the created group's details
+
+**Throws**
+
+- `409` if username is already in use
+
+#### `GET /api/groups` - Get all groups
+
+**Returns**
+- An array of group details
+
+
+#### `GET /api/groups/member` - Get all groups the user is a member of
+
+**Returns**
+- An array of group details, with one entry for every group the user is in
+
+**Throws**
+- `403` if the user is not logged in
+
+#### `GET /api/groups/member?role=ROLE` - Get all groups in which user has corresponding role
+
+**Returns**
+- An array of group details, with one entry for every group in which the user has the corresponding role given in the query. This means that ROLE must be either 'member', 'moderator', or 'owner'
+
+**Throws**
+- `403` if the user is not logged in
+- `400` if ROLE is not either 'member', 'moderator', or 'owner'
+
+#### `GET /api/groups?groupId=ID` - Get group with group Id
+
+**Returns**
+- The group details of the group with name ID
+
+**Throws**
+- `400` if the group Id is not given
+- `404` if the group Id does not exist
+
+
+#### `POST /api/groups/:groupId?/member` - Join a group
+
+**Returns**
+- The group details of the group with associated groupId
+
+**Throws**
+* `403` if the user is not logged in
+- `404` if the group Id does not exist
+- `409` if the user is already a member of the group
+
+#### `DELETE /api/groups/:groupId?/member` - Leave A Group
+
+**Returns**
+- A success message
+
+**Throws**
+- `403` if user is not logged in
+- `404` if the group Id does not exist
+- `409` if the user is not in the group already
+
+#### `POST /api/groups/:groupId?/freets` - Post a freet to a group
+
+**Returns**
+* The updated group details of the group with name groupId
+  
+**Body**
+- `content` _{string}_ - The content of the freet
+
+**Throws**
+* `403` if the user is not logged in
+* `403` if the user is not in the group
+* `404` if the group Id does not exist
+* `409` if the user is not in the group already
+* `400` - If the freet content is empty or a stream of empty spaces
+* `413` If the freet content is more than 140 characters long
+
+
+## Moderation
+
+#### `GET /api/moderation?groupId=ID` - Get moderators for group Id
+
+**Returns**
+- The group moderators for group Id
+
+**Throws**
+- `400` if the group Id is not given
+- `404` if the group Id does not exist
+
+
+#### `DELETE /api/moderation/groups/:groupId?/freets/:freetId?` - Remove freet from group
+
+**Returns**
+* A success message
+
+**Throws**
+- `404` if the freetId is invalid
+- `404` if the groupId is invalid
+- `404` if the freet is not in the group specified by groupId
+- `403` if the user is not a moderator of the group specified by groupId
+- `403` if the user is not logged in
+
+
+
+#### `DELETE /api/moderation/groups/:groupId?/users/:userId?` - Remove user from group
+**Returns**
+* A success message
+
+**Throws**
+- `404` if the userId is invalid
+- `404` if the groupId is invalid
+- `404` if the user associated with userId is not in the group specified by groupId
+- `403` if the logged in user is not a moderator of the group specified by groupId
+- `403` if the user is not logged in
+
+## Owner
+
+#### `PUT /api/owner/groups/:groupId?` - Update an existing group's information
+
+**Body** _(no need to add fields that are not being changed)_
+- `name` _{string}_ - The group's name
+- `description` _{string}_ - The group's description
+
+**Returns**
+- A success message
+- An object with the updated group details
+
+**Throws**
+- `403` if the user is not logged in
+- `403` if the user is not the group owner
+- `404` if the groupId is invalid
+- `409` if the name is already in use
+
+#### `DELETE /api/owner/groups/:groupId?` - Delete an existing group
+
+**Returns**
+- A success message
+
+**Throws**
+- `403` if the user is not logged in
+- `403` if the user is not the group owner
+- `404` if the groupId is invalid
+
+#### `POST /api/owner/groups/:groupId?/moderators` - Add user as moderator in group
+
+**Body**
+* `userId` *{string}* - userId of user to add as moderator to group
+
+**Returns**
+* A success message
+* The group details of the updated group
+
+**Throws**
+* `403` if the user is not logged in
+* `403` if the logged in user is not the group owner of the specified group
+* `404` if the groupId is invalid
+* `404` if the userId is invalid
+* `409` if the user specified by userId is already a moderator of the group
+
+#### `DELETE /api/owner/groups/:groupId?/moderators/:userId?` - Remove user from moderator position in group
+
+**Returns**
+* A success message
+
+**Throws**
+* `403` if the user is not logged in
+* `403` if the logged in user is not the group owner of the specified group
+* `404` if the groupId is invalid
+* `404` if the userId is invalid
+* `409` if the user specified by userId is already a moderator of the group
+
+
+#### `PUT /api/owner/groups/:groupId?/newOwner` - Transfer ownership of group to another user
+
+**Body**
+* `userId` *{string}*  - id of user to transfer group ownership to
+
+**Returns**
+* Updated Owner object
+
+**Throws**
+* `403` if the user is not logged in
+* `403` if the logged in user is not the group owner of the specified group
+* `404` if the groupId is invalid
+* `404` if the userId is invalid
+* `409` if the userId given is the same as the current logged in user's id
+
+#### `Get /api/owner/groups?groupId=ID` - Get owner associated with group
+
+
+**Returns**
+* Owner object of owner associated with group
+
+**Throws**
+* `400` if groupId isn't given
+* `404` if group associated with groupId doesn't exist
+
+
+
 # Fritter
 
 Build your own not-quite-[Twitter](https://twitter.com/)!
@@ -166,248 +518,3 @@ Mongoose allows you to use schema validation if you want to ensure that certain 
 ```
 
 within the schema. This tells us that the `content` field must have type `String`, and that it is required for documents in that collection. A freet must have a `String` type value for the `content` field to be added to the freets collection.
-
-## API routes
-
-The following api routes have already been implemented for you (**Make sure to document all the routes that you have added.**):
-
-#### `GET /`
-
-This renders the `index.html` file that will be used to interact with the backend
-
-#### `GET /api/freets` - Get all the freets
-
-**Returns**
-
-- An array of all freets sorted in descending order by date modified
-
-#### `GET /api/freets?author=USERNAME` - Get freets by author
-
-**Returns**
-
-- An array of freets created by user with username `author`
-
-**Throws**
-
-- `400` if `author` is not given
-- `404` if `author` is not a recognized username of any user
-
-#### `POST /api/freets` - Create a new freet
-
-**Body**
-
-- `content` _{string}_ - The content of the freet
-
-**Returns**
-
-- A success message
-- A object with the created freet
-
-**Throws**
-
-- `403` if the user is not logged in
-- `400` If the freet content is empty or a stream of empty spaces
-- `413` If the freet content is more than 140 characters long
-
-#### `DELETE /api/freets/:freetId?` - Delete an existing freet
-
-**Returns**
-
-- A success message
-
-**Throws**
-
-- `403` if the user is not logged in
-- `403` if the user is not the author of the freet
-- `404` if the freetId is invalid
-
-#### `PUT /api/freets/:freetId?` - Update an existing freet
-
-**Body**
-
-- `content` _{string}_ - The new content of the freet
-
-**Returns**
-
-- A success message
-- An object with the updated freet
-
-**Throws**
-
-- `403` if the user is not logged in
-- `404` if the freetId is invalid
-- `403` if the user is not the author of the freet
-- `400` if the new freet content is empty or a stream of empty spaces
-- `413` if the new freet content is more than 140 characters long
-
-#### `POST /api/users/session` - Sign in user
-
-**Body**
-
-- `username` _{string}_ - The user's username
-- `password` _{string}_ - The user's password
-
-**Returns**
-
-- A success message
-- An object with user's details (without password)
-
-**Throws**
-
-- `403` if the user is already logged in
-- `400` if username or password is not in correct format format or missing in the req
-- `401` if the user login credentials are invalid
-
-#### `DELETE /api/users/session` - Sign out user
-
-**Returns**
-
-- A success message
-
-**Throws**
-
-- `403` if user is not logged in
-
-#### `POST /api/users` - Create an new user account
-
-**Body**
-
-- `username` _{string}_ - The user's username
-- `password` _{string}_ - The user's password
-
-**Returns**
-
-- A success message
-- An object with the created user's details (without password)
-
-**Throws**
-
-- `403` if there is a user already logged in
-- `400` if username or password is in the wrong format
-- `409` if username is already in use
-
-#### `PUT /api/users` - Update a user's profile
-
-**Body** _(no need to add fields that are not being changed)_
-
-- `username` _{string}_ - The user's username
-- `password` _{string}_ - The user's password
-
-**Returns**
-
-- A success message
-- An object with the update user details (without password)
-
-**Throws**
-
-- `403` if the user is not logged in
-- `400` if username or password is in the wrong format
-- `409` if the username is already in use
-
-#### `DELETE /api/users` - Delete user
-
-**Returns**
-
-- A success message
-
-**Throws**
-
-- `403` if the user is not logged in
-
-#### `POST /api/groups` -- create a new group
-
-**Body**
-- `name` _{string}_ - The group's name
-- `description` _{string}_ - The group's description
-
-**Returns**
-- A success message
-- An object with the created group's details
-
-**Throws**
-
-- `409` if username is already in use
-
-#### `PUT /api/groups/:groupId` - Update an existing group's information
-
-**Body** _(no need to add fields that are not being changed)_
-- `name` _{string}_ - The group's name
-- `description` _{string}_ - The group's description
-
-**Returns**
-- A success message
-- An object with the update group details
-
-**Throws**
-- `403` if the user is not logged in
-- `403` if the user is not the group creator
-- `409` if the name is already in use
-
-#### `DELETE /api/groups/:groupId?` - Delete an existing group
-
-**Returns**
-- A success message
-
-**Throws**
-- `403` if the user is not logged in
-- `403` if the user is not the group creator
-- `404` if the groupId is invalid
-
-#### `GET /api/groups` - Get all groups
-
-**Returns**
-- An array of group details
-
-#### `GET /api/groups/member` - Get all groups the user is a member of
-
-**Returns**
-- An array of group details, with one entry for every group the user is in
-
-**Throws**
-- `403` if the user is not logged in
-
-#### `GET /api/groups?groupId=ID` - Get group with group id
-
-**Returns**
-- The group details of the group with Id ID
-
-**Throws**
-- `400` if groupId is not given
-- `404` if the group Id does not exist
-
-#### `GET /api/moderator?groupId=ID` - Get moderators for group Id
-
-**Returns**
-- The group moderators for group Id
-
-**Throws**
-- `400` if the group Id is not given
-- `404` if the group Id does not exist
-
-#### `DELETE /api/moderator/post/:groupId` - Delete post in group
-
-#### `DELETE /api/moderator/post/:groupId` - Delete post in group
-
-#### `PUT /api/moderator/member/:groupId` - Add user to group
-
-#### `DELETE /api/moderator/member/:groupId` - Delete member from group
-
-#### `DELETE /api/owner/group/:groupId` - Delete group
-
-#### `DELETE /api/moderator/:groupId` - Remove user from moderator position in group
-
-#### `PUT /api/owner/moderator/:groupId` - Put user in moderator position in group
-
-#### `GET /api/activity/` - Get User's activity for today
-
-#### `GET /api/time-limit/` - Get User's time limit information
-
-#### `PUT /api/time-limit/` - Update User's time limit information
-
-#### `GET /api/notifs/` - Get User's notifications
-
-#### `PUT /api/notifs/` - Add notification to User's notifications
-
-#### `PUT /api/notifs/enable`  - Enable User's notifications for event
-
-#### `PUT /api/notifs/disable`  - Disable User's notifications for event
