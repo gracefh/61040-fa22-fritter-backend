@@ -90,7 +90,7 @@ class OwnerCollection {
   static async findOneByGroupId(
     groupId: Types.ObjectId | string
   ): Promise<HydratedDocument<Owner>> {
-    return OwnerModel.findOne({ _id: groupId })
+    return OwnerModel.findOne({ groupId: groupId })
       .populate("groupId")
       .populate("userId");
   }

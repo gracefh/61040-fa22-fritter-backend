@@ -212,4 +212,4 @@ router.get(
   }
 );
 
-export { router as OwnerRouter };
+export { router as ownerRouter };

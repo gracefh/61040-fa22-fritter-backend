@@ -159,15 +159,15 @@ const isAuthorExists = async (req: Request, res: Response, next: NextFunction) =
  const isUserExists = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.params.userId) {
     res.status(400).json({
-      error: 'Provided username must be nonempty.'
+      error: 'Provided user Id must be nonempty.'
     });
     return;
   }
 
-  const user = await UserCollection.findOneByUsername(req.params.userId as string);
+  const user = await UserCollection.findOneByUserId(req.params.userId as string);
   if (!user) {
     res.status(404).json({
-      error: `A user with username ${req.params.userId as string} does not exist.`
+      error: `A user with userId ${req.params.userId as string} does not exist.`
     });
     return;
   }
@@ -181,15 +181,15 @@ const isAuthorExists = async (req: Request, res: Response, next: NextFunction) =
  const isUserBodyExists = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.body.userId) {
     res.status(400).json({
-      error: 'Provided username must be nonempty.'
+      error: 'Provided user Id must be nonempty.'
     });
     return;
   }
 
-  const user = await UserCollection.findOneByUsername(req.body.userId as string);
+  const user = await UserCollection.findOneByUserId(req.body.userId as string);
   if (!user) {
     res.status(404).json({
-      error: `A user with username ${req.body.userId as string} does not exist.`
+      error: `A user with user Id ${req.body.userId as string} does not exist.`
     });
     return;
   }

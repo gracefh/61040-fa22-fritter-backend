@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, response } from "express";
 import GroupCollection from "../group/collection";
 import ModerationCollection from "../moderation/collection";
 import { Types } from "mongoose";
-import UserCollection from "user/collection";
+import UserCollection from "../user/collection";
 
 /**
  * Checks if current logged in user is a moderator of the group
@@ -77,9 +77,14 @@ const isUserBodyNotAlreadyModerator = async (
     return;
   }
 
-  const result = ModerationCollection.findOneByGroupAndUser(user._id, group._id);
-  if (result) {
-    res.status(403).json({
+  const result = await ModerationCollection.findOneByGroupAndUser(
+    user._id,
+    group._id
+  );
+
+  console.log(result);
+  if (result !== null) {
+    res.status(409).json({
       error: {
         userAlreadyModerator: `User with userId ${req.body.userId} is already moderator of group with group Id ${req.params.groupId}`,
       },
@@ -93,7 +98,7 @@ const isUserBodyNotAlreadyModerator = async (
 /**
  * Checks if current user passed in as param is currently moderator of the group
  */
- const isUserParamModerator = async (
+const isUserParamModerator = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -125,7 +130,10 @@ const isUserBodyNotAlreadyModerator = async (
     return;
   }
 
-  const result = ModerationCollection.findOneByGroupAndUser(user._id, group._id);
+  const result = await ModerationCollection.findOneByGroupAndUser(
+    user._id,
+    group._id
+  );
   if (!result) {
     res.status(403).json({
       error: {

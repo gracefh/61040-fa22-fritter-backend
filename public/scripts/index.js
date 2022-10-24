@@ -50,6 +50,7 @@ const formsAndHandlers = {
   "get-all-moderators-for-group": getModeratorsForGroup,
   "remove-freet-from-group": removeFreetFromGroup,
   "remove-user-from-group": removeUserFromGroup,
+  "get-group-owner": getGroupOwner,
   "change-group-name": changeGroupName,
   "change-group-description": changeGroupDescription,
   "transfer-ownership": transferOwnership,

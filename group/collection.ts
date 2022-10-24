@@ -150,7 +150,8 @@ class GroupCollection {
         (group) =>
           group.moderators.length > 0 && group.moderators.includes(user._id)
       );
-    return allGroups.filter((group) => group.owner === user._id);
+
+    return GroupModel.find({ owner: userId });
   }
 
   /**

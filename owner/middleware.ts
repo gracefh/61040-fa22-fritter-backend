@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import GroupCollection from "../group/collection";
-import ModerationCollection from "moderation/collection";
 import { Types } from "mongoose";
-import OwnerCollection from "./collection";
+import OwnerCollection from "../owner/collection";
 
 /**
  * Checks if current logged in user is a owner of the group
@@ -22,8 +21,7 @@ const isUserOwner = async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
   const result = await OwnerCollection.findOneByGroupId(group._id);
-
-  if (req.session.userId !== result.userId) {
+  if (req.session?.userId !== result.userId._id.toString()) {
     res.status(403).json({
       error: {
         userNotOwner: `Current logged in user is not owner of group with group Id ${req.params.groupId}`,
@@ -43,7 +41,7 @@ const isUserBodyNotCurrentUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.session.userId === req.body.userId) {
+  if (req.session?.userId === req.body?.userId) {
     res.status(403).json({
       error: {
         userMatches: `User id supplied is the same as current logged in user`,
